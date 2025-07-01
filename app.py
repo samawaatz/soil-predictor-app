@@ -1,15 +1,25 @@
+# Soil Category Predictor App
 import streamlit as st
-import pandas as pd
 import pickle
+import numpy as np
 
-# Load model
+# Load the model
 with open("soil_model.pkl", "rb") as f:
     model = pickle.load(f)
 
-# Sidebar
-st.sidebar.image("Soil Particles.png", use_column_width=True)
-st.sidebar.title("About This App")
-st.sidebar.write("""
+# App title and description
+st.set_page_config(page_title="Soil Category Predictor", layout="centered")
+st.image("Soil Particles.png", use_column_width=True)
+st.title("\U0001F331 Soil Category Predictor")
+st.markdown("""
+    ### Enter Soil Test Values Below:
+""")
+
+# Sidebar info
+st.sidebar.image("Soil Particles.png")
+st.sidebar.markdown("""
+**About This App**
+
 This app predicts **Soil Category** based on user input features:
 - pH
 - Moisture
@@ -19,23 +29,16 @@ This app predicts **Soil Category** based on user input features:
 - Potassium
 """)
 
-# Main Title
-st.title("🌱 Soil Category Predictor")
+# Input fields
+pH = st.number_input("pH", min_value=0.0, max_value=14.0, step=0.01)
+moisture = st.number_input("Moisture", min_value=0.0, step=0.01)
+organic_matter = st.number_input("Organic Matter", min_value=0.0, step=0.01)
+nitrogen = st.number_input("Nitrogen", min_value=0.0, step=0.01)
+phosphorus = st.number_input("Phosphorus", min_value=0.0, step=0.01)
+potassium = st.number_input("Potassium", min_value=0.0, step=0.01)
 
-st.markdown("---")
-st.markdown("### Enter Soil Test Values Below:")
-
-# Input Fields
-ph = st.number_input("pH", min_value=0.0, help="Acidity or alkalinity of soil")
-moisture = st.number_input("Moisture", min_value=0, help="Water content in soil (%)")
-organic_matter = st.number_input("Organic Matter", min_value=0.0, help="Organic material in %")
-nitrogen = st.number_input("Nitrogen", min_value=0.0, help="Nitrogen level in soil")
-phosphorus = st.number_input("Phosphorus", min_value=0.0, help="Phosphorus content")
-potassium = st.number_input("Potassium", min_value=0.0, help="Potassium content")
-
-# Predict Button
-if st.button("🔍 Predict Soil Category"):
-    input_df = pd.DataFrame([[ph, moisture, organic_matter, nitrogen, phosphorus, potassium]],
-                            columns=["pH", "Moisture", "Organic_Matter", "Nitrogen", "Phosphorus", "Potassium"])
-    prediction = model.predict(input_df)
-    st.success(f"🧪 Predicted Soil Category: **{prediction[0]}**")
+# Prediction button
+if st.button("Predict Soil Category"):
+    input_data = np.array([[pH, moisture, organic_matter, nitrogen, phosphorus, potassium]])
+    prediction = model.predict(input_data)[0]
+    st.success(f"Predicted Soil Category: **{prediction}**")
